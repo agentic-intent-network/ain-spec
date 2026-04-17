@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="https://xml2rfc.tools.ietf.org/authoring/rfc7991.rnc" type="application/relax-ng-compact-syntax"?>
-<!DOCTYPE rfc SYSTEM "rfc7749bis.dtd">
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude" ipr="trust200902" docName="draft-feng-nmrg-ain-architecture-00" category="info" submissionType="IETF" xml:lang="en" version="3">
 
   <front>
@@ -55,7 +54,7 @@
       <t>
         The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when, they appear in all capitals, as shown here.
       </t>
-      <dl newline="false" spacing="normal">
+      <dl newline="true">
         <dt>Intent:</dt>
         <dd>A structured representation of a task request, expressed as a capability class identifier and associated constraints.</dd>
 
@@ -189,18 +188,26 @@
 
       <section anchor="architectural-requirements" numbered="true" toc="default">
         <name>Architectural Requirements</name>
-        <dl newline="false" spacing="normal">
+        <dl newline="true">
           <dt>R_open (Open Participation):</dt>
-          <dd>Any agent, regardless of framework, language, or deployment environment, MUST be able to register capabilities and invoke others without bilateral pre-registration.<vspace/>Derivation: Follows from the Narrow Waist principle. Requiring bilateral pre-registration reproduces the O(N^2) integration cost documented in <xref target="bilateral-problem"/>. A shared registration and routing substrate eliminates this cost structurally, as IP eliminated the need for pairwise host reachability agreements.</dd>
+          <dd>Any agent, regardless of framework, language, or deployment environment, MUST be able to register capabilities and invoke others without bilateral pre-registration.
+
+Derivation: Follows from the Narrow Waist principle. Requiring bilateral pre-registration reproduces the O(N^2) integration cost documented in <xref target="bilateral-problem"/>. A shared registration and routing substrate eliminates this cost structurally, as IP eliminated the need for pairwise host reachability agreements.</dd>
 
           <dt>R_local (Local Decision-Making):</dt>
-          <dd>Each forwarding decision MUST be made locally using datagram-visible and locally maintained state; no centralized per-request routing oracle is assumed.<vspace/>Derivation: Follows from the End-to-End Argument and Decentralized Scalability. A centralized routing oracle would become a bottleneck, a single point of failure, and a policy chokepoint -- reproducing architecturally the same problems that distributed routing protocols were designed to eliminate.</dd>
+          <dd>Each forwarding decision MUST be made locally using datagram-visible and locally maintained state; no centralized per-request routing oracle is assumed.
+
+Derivation: Follows from the End-to-End Argument and Decentralized Scalability. A centralized routing oracle would become a bottleneck, a single point of failure, and a policy chokepoint -- reproducing architecturally the same problems that distributed routing protocols were designed to eliminate.</dd>
 
           <dt>R_hetero (Heterogeneous Capability Matching):</dt>
-          <dd>The architecture MUST support heterogeneous handler types (LLM-based, deterministic, legacy-wrapped) without requiring routing-fabric redesign.<vspace/>Derivation: Follows from the Narrow Waist principle and Policy/Mechanism Separation. The routing fabric must remain agnostic to execution substrate. Capability-matching semantics reside in the Semantic Substrate (<xref target="semantic-substrate"/>), not in forwarding components, allowing handler technology to evolve without architectural disruption.</dd>
+          <dd>The architecture MUST support heterogeneous handler types (LLM-based, deterministic, legacy-wrapped) without requiring routing-fabric redesign.
+
+Derivation: Follows from the Narrow Waist principle and Policy/Mechanism Separation. The routing fabric must remain agnostic to execution substrate. Capability-matching semantics reside in the Semantic Substrate (<xref target="semantic-substrate"/>), not in forwarding components, allowing handler technology to evolve without architectural disruption.</dd>
 
           <dt>R_dynamic (Dynamic Capability Discovery):</dt>
-          <dd>The architecture MUST support dynamic capability additions, updates, and withdrawals with bounded convergence behavior.<vspace/>Derivation: Follows from Decentralized Scalability and the operational reality of large-scale deployments. Agent populations are not static: handlers are deployed, updated, and retired continuously. The routing fabric must accommodate this dynamism while providing convergence guarantees sufficient for operational stability -- a direct analogue of liveness and loop-freedom requirements in IP routing protocols.</dd>
+          <dd>The architecture MUST support dynamic capability additions, updates, and withdrawals with bounded convergence behavior.
+
+Derivation: Follows from Decentralized Scalability and the operational reality of large-scale deployments. Agent populations are not static: handlers are deployed, updated, and retired continuously. The routing fabric must accommodate this dynamism while providing convergence guarantees sufficient for operational stability -- a direct analogue of liveness and loop-freedom requirements in IP routing protocols.</dd>
         </dl>
       </section>
 
@@ -209,7 +216,7 @@
         <t>
           The architectural requirements above define what the AIN coordination layer must provide. They depend, in turn, on two properties of the underlay transport fabric. These are stated as requirements on the underlay, not as design choices of the AIN architecture itself, consistent with the End-to-End Argument: AIN does not prescribe how reachability is achieved, only that it must be available.
         </t>
-        <dl newline="false" spacing="normal">
+        <dl newline="true">
           <dt>R_u1 (Handler Reachability):</dt>
           <dd>Any Intent Router MUST be able to deliver an Intent Datagram to any registered Intent Handler.</dd>
 
@@ -230,10 +237,10 @@
         <t>
           AIN is organized into three architectural parts:
         </t>
-        <ol type="(A)">
-          <li>Networking: underlay/transport fabric, Intent Routing data plane, Intent Routing control plane, and Semantic Substrate.</li>
-          <li>Application Entities: Originator, Dispatcher, and Handler roles.</li>
-          <li>Runtime Dependencies: execution runtime and compute infrastructure used by application entities.</li>
+        <ol spacing="normal">
+          <li>(A) Networking: underlay/transport fabric, Intent Routing data plane, Intent Routing control plane, and Semantic Substrate.</li>
+          <li>(B) Application Entities: Originator, Dispatcher, and Handler roles.</li>
+          <li>(C) Runtime Dependencies: execution runtime and compute infrastructure used by application entities.</li>
         </ol>
         <t>
           Figure 1 illustrates the layered structure and the principal interactions among components.
@@ -302,31 +309,43 @@
         <t>
           Semantic Substrate (interaction (d)). The Semantic Substrate is consumed by the control plane, not the data plane. It provides the shared vocabulary that makes IC-OID prefix aggregation meaningful and capability matching consistent across heterogeneous handler types. Its role is analogous to the addressing and naming conventions that make IP prefix aggregation tractable: without shared semantics, CAP processing would require per-handler bespoke logic and could not scale.
         </t>
-        <texttable anchor="tbl-architecture" title="AIN Architecture Overview (Conceptual)" suppress-title="false" align="center" style="full">
-          <ttcol>Component</ttcol>
-          <ttcol>Responsibility</ttcol>
-          <ttcol>IP Analogy</ttcol>
-
-          <c>Underlay/Transport Fabric</c>
-          <c>End-to-end reachability under R_u1 and R_u2</c>
-          <c>Physical + Link</c>
-
-          <c>Intent Routing Data Plane</c>
-          <c>Stateless forwarding of intent datagrams</c>
-          <c>IP data plane</c>
-
-          <c>Intent Routing Control Plane</c>
-          <c>Capability advertisement and route-state maintenance</c>
-          <c>IP control plane</c>
-
-          <c>Semantic Substrate</c>
-          <c>Naming/matching semantics</c>
-          <c>Addressing</c>
-
-          <c>Application Entities</c>
-          <c>Intent origination, dispatch, and execution</c>
-          <c>End hosts</c>
-        </texttable>
+        <table anchor="tbl-architecture">
+          <name>AIN Architecture Overview (Conceptual)</name>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Responsibility</th>
+              <th>IP Analogy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Underlay/Transport Fabric</td>
+              <td>End-to-end reachability under R_u1 and R_u2</td>
+              <td>Physical + Link</td>
+            </tr>
+            <tr>
+              <td>Intent Routing Data Plane</td>
+              <td>Stateless forwarding of intent datagrams</td>
+              <td>IP data plane</td>
+            </tr>
+            <tr>
+              <td>Intent Routing Control Plane</td>
+              <td>Capability advertisement and route-state maintenance</td>
+              <td>IP control plane</td>
+            </tr>
+            <tr>
+              <td>Semantic Substrate</td>
+              <td>Naming/matching semantics</td>
+              <td>Addressing</td>
+            </tr>
+            <tr>
+              <td>Application Entities</td>
+              <td>Intent origination, dispatch, and execution</td>
+              <td>End hosts</td>
+            </tr>
+          </tbody>
+        </table>
       </section>
 
       <section anchor="intent-datagram" numbered="true" toc="default">
